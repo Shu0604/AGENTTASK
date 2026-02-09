@@ -1,0 +1,33 @@
+name: Sync files from ta064
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download updated files
+        run: |
+          BRANCH="claude/create-agenttask-platform-9TxZ8"
+          BASE="https://raw.githubusercontent.com/ta064/Test.swiftpm/${BRANCH}"
+          
+          curl -sL "${BASE}/index.html" -o index.html
+          curl -sL "${BASE}/tasks.html" -o tasks.html
+          curl -sL "${BASE}/register.html" -o register.html
+          curl -sL "${BASE}/api.html" -o api.html
+          curl -sL "${BASE}/pricing.html" -o pricing.html
+          curl -sL "${BASE}/contact.html" -o contact.html
+          mkdir -p css js
+          curl -sL "${BASE}/css/style.css" -o css/style.css
+          curl -sL "${BASE}/js/main.js" -o js/main.js
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "Update: design improvements, bilingual support, contact form"
+          git push
